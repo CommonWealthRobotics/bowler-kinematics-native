@@ -1,0 +1,83 @@
+plugins {
+    id 'java'
+    id "edu.wpi.first.GradleJni" version "0.9.0"
+    id 'cpp'
+}
+
+group = "com.neuronrobotics"
+version = "0.1.0"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+model {
+    //noinspection GroovyAssignabilityCheck
+    components {
+        native_library(JniNativeLibrarySpec) {
+            enableCheckTask true
+            javaCompileTasks << compileJava
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '*.cpp'
+                    }
+
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
+
+                        include '**/*.h'
+                    }
+                }
+            }
+
+            binaries.all {
+                cppCompiler.args "-std=c++17", "-O3", "-flto"
+                linker.args "-flto"
+            }
+        }
+    }
+
+    tasks {
+        def components = $.components
+        def found = false
+        components.each {
+            if (it in JniNativeLibrarySpec) {
+                def binaries = it.binaries.withType(SharedLibraryBinarySpec).each {
+                    if (found) {
+                        return
+                    } else {
+                        found = true
+                    }
+
+                    test.dependsOn it.tasks.link
+
+                    def filePath = it.tasks.link.linkedFile.get().asFile.parentFile
+                    test.systemProperty 'java.library.path', filePath.path + "/"
+                    test.environment 'LD_LIBRARY_PATH', filePath.path + "/"
+                    // Enable this if you make this a java application
+                    //run.systemProperty 'java.library.path', filePath
+                    //run.environment 'LD_LIBRARY_PATH', filePath
+                }
+            }
+        }
+    }
+}
