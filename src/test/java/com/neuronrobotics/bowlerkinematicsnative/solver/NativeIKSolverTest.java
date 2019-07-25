@@ -42,6 +42,8 @@ class NativeIKSolverTest
 						0
 				});
 
+		System.out.println("Expected:\n" + Arrays.toString(expected));
+		System.out.println("Actual:\n" + Arrays.toString(actual));
 		assertArrayEquals(expected, actual,
 				"Expected:\n" + Arrays.toString(expected) + "\nActual:\n" + Arrays
 						.toString(actual));
