@@ -16,10 +16,18 @@
  */
 package com.neuronrobotics.bowlerkinematicsnative.solver;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
 public class NativeIKSolver
 {
 	static {
-		System.loadLibrary("bowler_kinematics_native_native_library");
+		try {
+			RuntimeLoader.loadLibrary("bowler_kinematics_native_native_library",
+					Paths.get(System.getProperty("user.home"), "Bowler", "nativecache").toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static native float[] solve(int numberOfLinks, float[] data);
