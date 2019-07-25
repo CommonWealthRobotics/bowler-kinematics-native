@@ -19,7 +19,7 @@ package com.neuronrobotics.bowlerkinematicsnative.solver;
 public class NativeIKSolver
 {
 	static {
-		System.loadLibrary("native_library");
+		System.loadLibrary("bowler_kinematics_native_native_library");
 	}
 
 	public static native float[] solve(int numberOfLinks, float[] data);

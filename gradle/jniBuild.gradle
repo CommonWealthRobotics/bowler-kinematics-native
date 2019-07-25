@@ -1,7 +1,7 @@
 model {
     //noinspection GroovyAssignabilityCheck
     components {
-        native_library(JniNativeLibrarySpec) {
+        bowler_kinematics_native_native_library(JniNativeLibrarySpec) {
             enableCheckTask true
             javaCompileTasks << compileJava
             sources {
