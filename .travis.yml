@@ -1,13 +1,13 @@
-dist: bionic
 language: java
 
 matrix:
   fast_finish: true
   include:
     - os: linux
+      dist: bionic
       jdk: openjdk8
     - os: osx
-      osx_image: xcode8.3
+      osx_image: xcode9.3
 env:
   - TERM=dumb
 
