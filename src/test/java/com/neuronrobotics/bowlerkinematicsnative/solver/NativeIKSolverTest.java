@@ -16,6 +16,7 @@
  */
 package com.neuronrobotics.bowlerkinematicsnative.solver;
 
+import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import org.junit.jupiter.api.Test;
 
@@ -40,6 +41,9 @@ class NativeIKSolverTest
 						41.999999999999986f, 0, 1, 0, -44, 0, 0, 1, 169, 0, 0, 0, 1, 0, 0, 0, 0, 0,
 						0
 				});
-		assertArrayEquals(expected, actual);
+
+		assertArrayEquals(expected, actual,
+				"Expected:\n" + Arrays.toString(expected) + "\nActual:\n" + Arrays
+						.toString(actual));
 	}
 }
