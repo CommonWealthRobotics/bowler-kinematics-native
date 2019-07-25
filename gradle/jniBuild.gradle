@@ -23,8 +23,7 @@ model {
             }
 
             binaries.all {
-                cppCompiler.args "-std=c++17", "-O3", "-flto"
-                linker.args "-flto"
+                cppCompiler.args "-std=c++17", "-O3"
             }
         }
     }
