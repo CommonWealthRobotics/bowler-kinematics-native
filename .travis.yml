@@ -12,6 +12,9 @@ matrix:
 env:
   - TERM=dumb
 
+before_install:
+  - openssl aes-256-cbc -K $encrypted_bb837da2b164_key -iv $encrypted_bb837da2b164_iv -in gradle.properties.enc -out ~\/.gradle/gradle.properties -d
+
 script:
   - ./gradlew check --stacktrace -PlogTests
 
@@ -20,4 +23,5 @@ after_success:
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+
 cache: false
