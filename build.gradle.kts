@@ -66,7 +66,7 @@ val jar by tasks.existing(Jar::class) {
 }
 
 val publicationName = "publication-$projectName-${name.toLowerCase()}"
-val artifactName = "$projectName-${SystemUtils.OS_NAME.toLowerCase()}"
+val artifactName = "$projectName-${SystemUtils.OS_NAME.toLowerCase().replace(" ", "")}"
 
 publishing {
     publications {
