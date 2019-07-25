@@ -23,6 +23,14 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events "failed", "passed", "skipped", "started"
+        displayGranularity  0
+        showExceptions  true
+        showCauses  true
+        showStackTraces  true
+        exceptionFormat "full"
+    }
 }
 
 model {
