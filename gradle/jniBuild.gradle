@@ -1,38 +1,3 @@
-plugins {
-    id 'java'
-    id "edu.wpi.first.GradleJni" version "0.9.0"
-    id 'cpp'
-}
-
-group = "com.neuronrobotics"
-version = "0.1.0"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
-}
-
-test {
-    useJUnitPlatform()
-    testLogging {
-        events "failed", "passed", "skipped", "started"
-        displayGranularity  0
-        showExceptions  true
-        showCauses  true
-        showStackTraces  true
-        exceptionFormat "full"
-    }
-}
-
 model {
     //noinspection GroovyAssignabilityCheck
     components {

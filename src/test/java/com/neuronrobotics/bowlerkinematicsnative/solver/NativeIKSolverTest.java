@@ -42,7 +42,7 @@ class NativeIKSolverTest
 						0
 				});
 
-		assertArrayEquals(expected, actual, 0.05f,
+		assertArrayEquals(expected, actual, 0.07f,
 				"Expected:\n" + Arrays.toString(expected) + "\nActual:\n" + Arrays
 						.toString(actual));
 	}
