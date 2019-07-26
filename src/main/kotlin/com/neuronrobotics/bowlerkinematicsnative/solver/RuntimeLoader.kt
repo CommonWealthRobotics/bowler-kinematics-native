@@ -62,10 +62,16 @@ object RuntimeLoader {
         Files.newOutputStream(jniLibrary.toPath()).use { os ->
             val buffer = ByteArray(buffer64k)
             var readBytes: Int
-            do {
+            while (true) {
                 readBytes = libStream.read(buffer)
+
+                // -1 means end of stream
+                if (readBytes == -1) {
+                    break
+                }
+
                 os.write(buffer, 0, readBytes)
-            } while (readBytes != -1)
+            }
         }
     }
 
