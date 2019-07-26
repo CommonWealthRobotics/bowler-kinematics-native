@@ -20,7 +20,7 @@ matrix:
         - BOWLER_KINEMATICS_NATIVE_OS_NAME=macos
 
 script:
-  - ./gradlew check --stacktrace -PlogTests
+  - ./gradlew check --stacktrace
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock

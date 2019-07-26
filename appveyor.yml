@@ -1,20 +1,25 @@
 version: "{branch} {build}"
 
+environment:
+  BOWLER_KINEMATICS_NATIVE_OS_NAME: windows
+  BINTRAY_USER:
+    secure: UOjipw0d8yFEFsUOyVCJ4g==
+  BINTRAY_API_KEY:
+    secure: +45d6L1hA4K6zPsZEY2Auix3t9jSqdC4jFcV/+b9FwJzltu4yeXa+o6kRjYnH3aZ
+  JAVA_HOME: C:\Program Files\Java\jdk1.8.0
+
+matrix:
+  fast_finish: true
+
 build:
   verbosity: detailed
 
 build_script:
-  - gradlew.bat assemble --stacktrace
+  - gradlew.bat spotlessApply --no-daemon
+  - gradlew.bat assemble --no-daemon
 
 test_script:
-  - gradlew.bat check --stacktrace
+  - gradlew.bat check --stacktrace --no-daemon
 
-cache:
-  - C:\Users\appveyor\.gradle
-
-environment:
-  matrix:
-    - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
-
-matrix:
-  fast_finish: true
+on_success:
+  - ps: If ($env:APPVEYOR_REPO_TAG) { gradlew.bat bintrayUpload --stacktrace }
