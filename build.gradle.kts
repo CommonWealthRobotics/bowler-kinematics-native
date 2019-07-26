@@ -5,7 +5,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.diffplug.gradle.spotless") version "3.22.0"
+    id("com.diffplug.gradle.spotless") version "3.23.1"
     id("org.jlleitschuh.gradle.ktlint") version "7.3.0"
     id("io.gitlab.arturbosch.detekt") version "1.0.0-RC16"
     id("org.jetbrains.dokka") version "0.9.18"
