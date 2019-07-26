@@ -38,8 +38,12 @@ buildscript {
 }
 
 val projectName = "bowler-kinematics-native"
+val osName = System.getenv("BOWLER_KINEMATICS_NATIVE_OS_NAME") ?: "UNKNOWN-OS"
+val publicationName = "publication-$projectName-${name.toLowerCase()}"
+val publishedVersionName = "${property("bowler-kinematics-native.version") as String}-$osName"
+
 group = "com.neuronrobotics"
-version = property("bowler-kinematics-native.version") as String
+version = publishedVersionName
 
 repositories {
     jcenter()
@@ -158,11 +162,7 @@ val dokkaJar by tasks.creating(Jar::class) {
     from(tasks.dokka)
 }
 
-val publicationName = "publication-$projectName-${name.toLowerCase()}"
-val osName = System.getenv("BOWLER_KINEMATICS_NATIVE_OS_NAME")
-if (osName != null) {
-    val publishedVersionName = "${property("bowler-kinematics-native.version") as String}-$osName"
-
+if (osName != "UNKNOWN-OS") {
     publishing {
         publications {
             create<MavenPublication>(publicationName) {
