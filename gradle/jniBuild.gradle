@@ -39,7 +39,7 @@ model {
 
             binaries.all {
                 if (SystemUtils.IS_OS_WINDOWS) {
-                    cppCompiler.args "/std:c++17", "/O2", "/EHsc"
+                    cppCompiler.args "/Zc:__cplusplus", "/std:c++17", "/O2", "/EHsc"
                 } else {
                     cppCompiler.args "-std=c++17", "-O3"
                 }
