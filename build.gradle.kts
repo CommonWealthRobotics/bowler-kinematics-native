@@ -89,6 +89,7 @@ tasks.withType<Test> {
         showCauses = true
         showStackTraces = true
         exceptionFormat = TestExceptionFormat.FULL
+        showStandardStreams = true
     }
 }
 
@@ -149,9 +150,7 @@ val jar by tasks.existing(Jar::class) {
         File("$buildDir/libs/bowler_kinematics_native_native_library/shared/")
             .listFiles()!!
             .first { it.extension in listOf("so", "dylib", "dll") }
-            .also {
-                println(it)
-            }
+            .also { println(it) }
     })
 }
 
