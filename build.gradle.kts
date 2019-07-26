@@ -95,6 +95,8 @@ tasks.withType<Test> {
 
 testlogger {
     theme = ThemeType.STANDARD_PARALLEL
+    showExceptions = true
+    showStandardStreams = true
 }
 
 apply {
