@@ -21,14 +21,19 @@ import java.nio.file.Paths
 object NativeIKSolver {
 
     init {
-        RuntimeLoader.loadLibrary(
-            "bowler_kinematics_native_native_library",
-            Paths.get(
-                System.getProperty("user.home"),
-                "Bowler",
-                "nativecache"
-            ).toString()
-        )
+        try {
+            RuntimeLoader.loadLibrary(
+                "bowler_kinematics_native_native_library",
+                Paths.get(
+                    System.getProperty("user.home"),
+                    "Bowler",
+                    "nativecache"
+                ).toString()
+            )
+        } catch (ex: Exception) {
+            println(System.getenv("java.lang.path"))
+            ex.printStackTrace()
+        }
     }
 
     @SuppressWarnings("LongParameterList")
