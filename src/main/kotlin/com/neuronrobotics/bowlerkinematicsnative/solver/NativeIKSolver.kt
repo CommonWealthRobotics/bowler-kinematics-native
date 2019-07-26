@@ -31,5 +31,12 @@ object NativeIKSolver {
         )
     }
 
-    external fun solve(numberOfLinks: Int, data: FloatArray): FloatArray
+    external fun solve(
+        numberOfLinks: Int,
+        dhParams: FloatArray,
+        upperJointLimits: FloatArray,
+        lowerJointLimits: FloatArray,
+        initialJointAngles: FloatArray,
+        target: FloatArray
+    ): FloatArray
 }

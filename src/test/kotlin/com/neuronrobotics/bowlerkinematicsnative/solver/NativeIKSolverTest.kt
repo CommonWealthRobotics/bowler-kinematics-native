@@ -51,19 +51,33 @@ internal class NativeIKSolverTest {
                 25f,
                 Math.toRadians(90.0).toFloat(),
                 0f,
+                0f
+            ),
+            floatArrayOf(
+                Math.toRadians(180.0).toFloat(),
+                Math.toRadians(180.0).toFloat(),
+                Math.toRadians(180.0).toFloat(),
+                Math.toRadians(180.0).toFloat(),
+                Math.toRadians(180.0).toFloat(),
+                Math.toRadians(180.0).toFloat()
+            ),
+            floatArrayOf(
+                Math.toRadians(-180.0).toFloat(),
+                Math.toRadians(-180.0).toFloat(),
+                Math.toRadians(-180.0).toFloat(),
+                Math.toRadians(-180.0).toFloat(),
+                Math.toRadians(-180.0).toFloat(),
+                Math.toRadians(-180.0).toFloat()
+            ),
+            floatArrayOf(
                 0f,
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat(),
+                0f,
+                0f,
+                0f,
+                0f,
+                0f
+            ),
+            floatArrayOf(
                 1f,
                 0f,
                 0f,
@@ -79,13 +93,7 @@ internal class NativeIKSolverTest {
                 0f,
                 0f,
                 0f,
-                1f,
-                0f,
-                0f,
-                0f,
-                0f,
-                0f,
-                0f
+                1f
             )
         )
 
