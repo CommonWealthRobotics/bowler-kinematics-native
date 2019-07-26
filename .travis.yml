@@ -29,5 +29,5 @@ cache: false
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-  - echi $TRAVIS_TAG
+  - echo $TRAVIS_TAG
   - if [ $TRAVIS_TAG != "" && $TRAVIS_PULL_REQUEST == "false" ]; then ./gradlew bintrayUpload; fi
