@@ -17,6 +17,13 @@ maven("https://dl.bintray.com/commonwealthrobotics/maven-artifacts")
 
 Although the latest version number may be `x.x.x-linux` or `x.x.x-macos`, there are multiple variants of the
 same version available. Declare the correct dependency for your platform using:
+
+In `gradle.properties`:
+```properties
+bowler-kinematics-native.version=x.x.x
+```
+
+In your build file:
 ```kotlin
 fun bowlerKinematicsNativeVersionSuffix() = when {
     SystemUtils.IS_OS_WINDOWS -> "windows"
