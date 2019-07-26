@@ -14,21 +14,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with bowler-kinematics-native.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.neuronrobotics.bowlerkinematicsnative.solver;
+package com.neuronrobotics.bowlerkinematicsnative.solver
 
-import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Paths
 
-public class NativeIKSolver
-{
-	static {
-		try {
-			RuntimeLoader.loadLibrary("bowler_kinematics_native_native_library",
-					Paths.get(System.getProperty("user.home"), "Bowler", "nativecache").toString());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+object NativeIKSolver {
 
-	public static native float[] solve(int numberOfLinks, float[] data);
+    init {
+        RuntimeLoader.loadLibrary(
+            "bowler_kinematics_native_native_library",
+            Paths.get(
+                System.getProperty("user.home"),
+                "Bowler",
+                "nativecache"
+            ).toString()
+        )
+    }
+
+    external fun solve(numberOfLinks: Int, data: FloatArray): FloatArray
 }

@@ -1,15 +1,28 @@
+import com.adarshr.gradle.testlogger.theme.ThemeType
 import org.apache.commons.lang3.SystemUtils
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("com.diffplug.gradle.spotless") version "3.22.0"
+    id("org.jlleitschuh.gradle.ktlint") version "7.3.0"
+    id("io.gitlab.arturbosch.detekt") version "1.0.0-RC16"
+    id("org.jetbrains.dokka") version "0.9.18"
+    id("com.adarshr.test-logger") version "1.6.0"
+    id("edu.wpi.first.GradleJni") version "0.9.0"
+    id("com.jfrog.bintray") version "1.8.3"
     java
     cpp
-    id("edu.wpi.first.GradleJni") version "0.9.0"
     `maven-publish`
-    id("com.jfrog.bintray") version "1.8.3"
     `java-library`
 }
+
+apply {
+    plugin("kotlin")
+}
+
+val spotlessLicenseHeaderDelimiter = "(@|package|import)"
 
 buildscript {
     repositories {
@@ -17,7 +30,11 @@ buildscript {
     }
 
     dependencies {
-        classpath(group = "org.apache.commons", name = "commons-lang3", version = property("commons-lang3.version") as String)
+        classpath(
+            group = "org.apache.commons",
+            name = "commons-lang3",
+            version = property("commons-lang3.version") as String
+        )
     }
 }
 
@@ -25,29 +42,44 @@ val projectName = "bowler-kinematics-native"
 group = "com.neuronrobotics"
 version = property("bowler-kinematics-native.version") as String
 
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    implementation(kotlin("stdlib-jdk8", property("kotlin.version") as String))
+    implementation(
+        group = "org.apache.commons",
+        name = "commons-lang3",
+        version = property("commons-lang3.version") as String
+    )
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.1.0")
+
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.1.0")
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation(group = "org.apache.commons", name = "commons-lang3", version = property("commons-lang3.version") as String)
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.1.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.1.0")
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = listOf("-Xjvm-default=enable", "-progressive")
+    }
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
     testLogging {
         events(
-                TestLogEvent.FAILED,
-                TestLogEvent.PASSED,
-                TestLogEvent.SKIPPED,
-                TestLogEvent.STARTED
+            TestLogEvent.FAILED,
+            TestLogEvent.PASSED,
+            TestLogEvent.SKIPPED,
+            TestLogEvent.STARTED
         )
         displayGranularity = 0
         showExceptions = true
@@ -57,8 +89,61 @@ tasks.withType<Test> {
     }
 }
 
+testlogger {
+    theme = ThemeType.STANDARD_PARALLEL
+}
+
 apply {
     from(rootProject.file("gradle/jniBuild.gradle"))
+}
+
+spotless {
+    /*
+     * We use spotless to lint the Gradle Kotlin DSL files that make up the build.
+     * These checks are dependencies of the `check` task.
+     */
+    kotlinGradle {
+        ktlint(property("ktlint.version") as String)
+        trimTrailingWhitespace()
+    }
+
+    freshmark {
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+
+    format("extraneous") {
+        target("src/**/*.fxml")
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+
+    java {
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+        @Suppress("INACCESSIBLE_TYPE")
+        licenseHeaderFile(
+            "${rootProject.rootDir}/config/spotless/bowler-kinematics-native.license",
+            spotlessLicenseHeaderDelimiter
+        )
+    }
+
+    kotlin {
+        ktlint(property("ktlint.version") as String)
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+        @Suppress("INACCESSIBLE_TYPE")
+        licenseHeaderFile(
+            "${rootProject.rootDir}/config/spotless/bowler-kinematics-native.license",
+            spotlessLicenseHeaderDelimiter
+        )
+    }
 }
 
 val jar by tasks.existing(Jar::class) {
@@ -72,12 +157,12 @@ val sourcesJar by tasks.creating(Jar::class) {
     from(sourceSets.main.get().allSource)
 }
 
-val javadocJar by tasks.creating(Jar::class) {
+val dokkaJar by tasks.creating(Jar::class) {
     group = JavaBasePlugin.DOCUMENTATION_GROUP
-    description = "Assembles Javadocs"
+    description = "Assembles Kotlin docs with Dokka"
     archiveClassifier.set("javadoc")
     archiveBaseName.set(projectName)
-    from(tasks.javadoc)
+    from(tasks.dokka)
 }
 
 val publicationName = "publication-$projectName-${name.toLowerCase()}"
@@ -89,7 +174,7 @@ publishing {
             artifactId = artifactName
             from(components["java"])
             artifact(sourcesJar)
-            artifact(javadocJar)
+            artifact(dokkaJar)
         }
     }
 }
@@ -113,4 +198,15 @@ bintray {
             desc = "bowler-kinematics implemented natively."
         }
     }
+}
+
+tasks.dokka {
+    dependsOn(tasks.classes)
+    outputFormat = "html"
+    outputDirectory = "$buildDir/javadoc"
+}
+
+tasks.wrapper {
+    gradleVersion = rootProject.property("gradle-wrapper.version") as String
+    distributionType = Wrapper.DistributionType.ALL
 }
