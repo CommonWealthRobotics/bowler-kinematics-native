@@ -66,6 +66,20 @@ val jar by tasks.existing(Jar::class) {
     from({ File("$buildDir/libs/bowler_kinematics_native_native_library/shared/").listFiles()!! })
 }
 
+val sourcesJar by tasks.creating(Jar::class) {
+    archiveClassifier.set("sources")
+    archiveBaseName.set(projectName)
+    from(sourceSets.main.get().allSource)
+}
+
+val javadocJar by tasks.creating(Jar::class) {
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+    description = "Assembles Javadocs"
+    archiveClassifier.set("javadoc")
+    archiveBaseName.set(projectName)
+    from(tasks.javadoc)
+}
+
 val publicationName = "publication-$projectName-${name.toLowerCase()}"
 val artifactName = "$projectName-${SystemUtils.OS_NAME.toLowerCase().replace(" ", "")}"
 
@@ -74,6 +88,8 @@ publishing {
         create<MavenPublication>(publicationName) {
             artifactId = artifactName
             from(components["java"])
+            artifact(sourcesJar)
+            artifact(javadocJar)
         }
     }
 }
