@@ -31,6 +31,7 @@ object NativeIKSolver {
         )
     }
 
+    @SuppressWarnings("LongParameterList")
     external fun solve(
         numberOfLinks: Int,
         dhParams: FloatArray,

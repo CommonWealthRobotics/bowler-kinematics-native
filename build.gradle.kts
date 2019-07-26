@@ -1,5 +1,4 @@
 import com.adarshr.gradle.testlogger.theme.ThemeType
-import org.apache.commons.lang3.SystemUtils
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -160,36 +159,39 @@ val dokkaJar by tasks.creating(Jar::class) {
 }
 
 val publicationName = "publication-$projectName-${name.toLowerCase()}"
-val artifactName = "$projectName-${SystemUtils.OS_NAME.toLowerCase().replace(" ", "")}"
+val osName = System.getenv("BOWLER_KINEMATICS_NATIVE_OS_NAME")
+if (osName != null) {
+    val publishedVersionName = "${property("bowler-kinematics-native.version") as String}-$osName"
 
-publishing {
-    publications {
-        create<MavenPublication>(publicationName) {
-            artifactId = artifactName
-            from(components["java"])
-            artifact(sourcesJar)
-            artifact(dokkaJar)
+    publishing {
+        publications {
+            create<MavenPublication>(publicationName) {
+                artifactId = projectName
+                from(components["java"])
+                artifact(sourcesJar)
+                artifact(dokkaJar)
+            }
         }
     }
-}
 
-bintray {
-    val bintrayApiUser = properties["bintray.api.user"] ?: System.getenv("BINTRAY_USER")
-    val bintrayApiKey = properties["bintray.api.key"] ?: System.getenv("BINTRAY_API_KEY")
-    user = bintrayApiUser as String?
-    key = bintrayApiKey as String?
-    setPublications(publicationName)
-    with(pkg) {
-        repo = "maven-artifacts"
-        name = projectName
-        userOrg = "commonwealthrobotics"
-        publish = true
-        setLicenses("LGPL-3.0")
-        vcsUrl = "https://github.com/CommonWealthRobotics/bowler-kinematics-native.git"
-        githubRepo = "https://github.com/CommonWealthRobotics/bowler-kinematics-native"
-        with(version) {
-            name = property("bowler-kinematics-native.version") as String
-            desc = "bowler-kinematics implemented natively."
+    bintray {
+        val bintrayApiUser = properties["bintray.api.user"] ?: System.getenv("BINTRAY_USER")
+        val bintrayApiKey = properties["bintray.api.key"] ?: System.getenv("BINTRAY_API_KEY")
+        user = bintrayApiUser as String?
+        key = bintrayApiKey as String?
+        setPublications(publicationName)
+        with(pkg) {
+            repo = "maven-artifacts"
+            name = projectName
+            userOrg = "commonwealthrobotics"
+            publish = true
+            setLicenses("LGPL-3.0")
+            vcsUrl = "https://github.com/CommonWealthRobotics/bowler-kinematics-native.git"
+            githubRepo = "https://github.com/CommonWealthRobotics/bowler-kinematics-native"
+            with(version) {
+                name = publishedVersionName
+                desc = "bowler-kinematics implemented natively."
+            }
         }
     }
 }

@@ -12,8 +12,12 @@ matrix:
     - os: linux
       dist: bionic
       jdk: openjdk11
+      env:
+        - BOWLER_KINEMATICS_NATIVE_OS_NAME=linux
     - os: osx
       osx_image: xcode10.1
+      env:
+        - BOWLER_KINEMATICS_NATIVE_OS_NAME=macos
 
 script:
   - ./gradlew check --stacktrace -PlogTests
