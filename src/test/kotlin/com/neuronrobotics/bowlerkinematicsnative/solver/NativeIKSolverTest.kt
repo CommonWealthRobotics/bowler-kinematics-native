@@ -18,95 +18,101 @@ package com.neuronrobotics.bowlerkinematicsnative.solver
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 
 internal class NativeIKSolverTest {
 
     @Test
     fun testSolve() {
-        val expected =
-            floatArrayOf(0.6091736f, 0.32373807f, 1.2073439f, -0.032999218f, 1.1978451f, 0f)
-        val actual = NativeIKSolver.solve(
-            6,
-            floatArrayOf(
-                13f,
-                Math.toRadians(90.0).toFloat(),
-                32f,
-                Math.toRadians(-90.0).toFloat(),
-                25f,
-                Math.toRadians(-90.0).toFloat(),
-                93f,
-                Math.toRadians(180.0).toFloat(),
-                11f,
-                Math.toRadians(90.0).toFloat(),
-                24f,
-                Math.toRadians(90.0).toFloat(),
-                128f,
-                Math.toRadians(-90.0).toFloat(),
-                0f,
-                Math.toRadians(90.0).toFloat(),
-                0f,
-                0f,
-                0f,
-                Math.toRadians(-90.0).toFloat(),
-                25f,
-                Math.toRadians(90.0).toFloat(),
-                0f,
-                0f
-            ),
-            floatArrayOf(
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(180.0).toFloat(),
-                Math.toRadians(180.0).toFloat()
-            ),
-            floatArrayOf(
-                Math.toRadians(-180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat(),
-                Math.toRadians(-180.0).toFloat()
-            ),
-            floatArrayOf(
-                0f,
-                0f,
-                0f,
-                0f,
-                0f,
-                0f
-            ),
-            floatArrayOf(
-                1f,
-                0f,
-                0f,
-                41.999999999999986f,
-                0f,
-                1f,
-                0f,
-                -44f,
-                0f,
-                0f,
-                1f,
-                169f,
-                0f,
-                0f,
-                0f,
-                1f
+        try {
+            val expected =
+                floatArrayOf(0.6091736f, 0.32373807f, 1.2073439f, -0.032999218f, 1.1978451f, 0f)
+            val actual = NativeIKSolver.solve(
+                6,
+                floatArrayOf(
+                    13f,
+                    Math.toRadians(90.0).toFloat(),
+                    32f,
+                    Math.toRadians(-90.0).toFloat(),
+                    25f,
+                    Math.toRadians(-90.0).toFloat(),
+                    93f,
+                    Math.toRadians(180.0).toFloat(),
+                    11f,
+                    Math.toRadians(90.0).toFloat(),
+                    24f,
+                    Math.toRadians(90.0).toFloat(),
+                    128f,
+                    Math.toRadians(-90.0).toFloat(),
+                    0f,
+                    Math.toRadians(90.0).toFloat(),
+                    0f,
+                    0f,
+                    0f,
+                    Math.toRadians(-90.0).toFloat(),
+                    25f,
+                    Math.toRadians(90.0).toFloat(),
+                    0f,
+                    0f
+                ),
+                floatArrayOf(
+                    Math.toRadians(180.0).toFloat(),
+                    Math.toRadians(180.0).toFloat(),
+                    Math.toRadians(180.0).toFloat(),
+                    Math.toRadians(180.0).toFloat(),
+                    Math.toRadians(180.0).toFloat(),
+                    Math.toRadians(180.0).toFloat()
+                ),
+                floatArrayOf(
+                    Math.toRadians(-180.0).toFloat(),
+                    Math.toRadians(-180.0).toFloat(),
+                    Math.toRadians(-180.0).toFloat(),
+                    Math.toRadians(-180.0).toFloat(),
+                    Math.toRadians(-180.0).toFloat(),
+                    Math.toRadians(-180.0).toFloat()
+                ),
+                floatArrayOf(
+                    0f,
+                    0f,
+                    0f,
+                    0f,
+                    0f,
+                    0f
+                ),
+                floatArrayOf(
+                    1f,
+                    0f,
+                    0f,
+                    41.999999999999986f,
+                    0f,
+                    1f,
+                    0f,
+                    -44f,
+                    0f,
+                    0f,
+                    1f,
+                    169f,
+                    0f,
+                    0f,
+                    0f,
+                    1f
+                )
             )
-        )
 
-        assertArrayEquals(
-            expected,
-            actual,
-            0.07f,
-            """
+            assertArrayEquals(
+                expected,
+                actual,
+                0.07f,
+                """
                 Expected:
                 ${expected.joinToString()}
                 Actual:
                 ${actual.joinToString()}
                 """
-        )
+            )
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            fail(ex.message)
+        }
     }
 }
