@@ -8,7 +8,7 @@
 
 Native kinematics for the Bowler stack.
 
-# Use bowler-kinematics-native
+## Use bowler-kinematics-native
 
 Get the artifacts [here](https://bintray.com/commonwealthrobotics/maven-artifacts/bowler-kinematics-native):
 ```kotlin
