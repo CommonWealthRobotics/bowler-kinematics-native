@@ -145,7 +145,11 @@ spotless {
 
 val jar by tasks.existing(Jar::class) {
     dependsOn(":bowler_kinematics_native_native_librarySharedLibrary")
-    from({ File("$buildDir/libs/bowler_kinematics_native_native_library/shared/").listFiles()!! })
+    from({
+        File("$buildDir/libs/bowler_kinematics_native_native_library/shared/").listFiles()!!.also { 
+            println(it.joinToString())
+        }
+    })
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
