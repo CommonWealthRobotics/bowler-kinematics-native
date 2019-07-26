@@ -148,7 +148,7 @@ val jar by tasks.existing(Jar::class) {
     from({
         File("$buildDir/libs/bowler_kinematics_native_native_library/shared/")
             .listFiles()!!
-            .first { it.endsWith("so") || it.endsWith("dylib") || it.endsWith(".dll") }
+            .first { it.extension in listOf("so", "dylib", "dll") }
             .also {
                 println(it)
             }
