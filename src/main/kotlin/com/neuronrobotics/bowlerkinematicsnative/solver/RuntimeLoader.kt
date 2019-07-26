@@ -53,7 +53,15 @@ object RuntimeLoader {
 
                 copyStreamToFile(jniLibrary, libStream)
 
-                System.load(jniLibrary.absolutePath)
+                try {
+                    System.load(jniLibrary.absolutePath)
+                } catch (e: UnsatisfiedLinkError) {
+                    throw IllegalStateException(
+                        "Failed to load $libName. Current path: " +
+                            System.getProperty("java.lang.path"),
+                        e
+                    )
+                }
             }
         }
     }
