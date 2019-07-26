@@ -62,6 +62,7 @@ model {
                     test.dependsOn it.tasks.link
 
                     def filePath = it.tasks.link.linkedFile.get().asFile.parentFile
+                    filePath.listFiles().each { println it }
                     test.systemProperty 'java.library.path', filePath.path + "/"
                     test.environment 'LD_LIBRARY_PATH', filePath.path + "/"
                     // Enable this if you make this a java application
