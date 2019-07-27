@@ -40,11 +40,11 @@ object RuntimeLoader {
     fun loadLibrary(libName: String, extractionRoot: String) {
         try {
             System.loadLibrary(libName)
-        } catch (ule: UnsatisfiedLinkError) {
+        } catch (e: UnsatisfiedLinkError) {
             val libResource = getLibraryResource(libName)
             ClassLoader.getSystemResourceAsStream(libResource).use { libStream ->
                 if (libStream == null) {
-                    throw IOException(getLoadErrorMessage(libName))
+                    throw IOException(getLoadErrorMessage(libName), e)
                 }
 
                 val jniLibrary = File(extractionRoot, libResource).apply {
@@ -56,11 +56,7 @@ object RuntimeLoader {
                 try {
                     System.load(jniLibrary.absolutePath)
                 } catch (e: UnsatisfiedLinkError) {
-                    throw IllegalStateException(
-                        "Failed to load $libName. Current path: " +
-                            System.getProperty("java.lang.path"),
-                        e
-                    )
+                    throw IllegalStateException(getLoadErrorMessage(libName), e)
                 }
             }
         }
