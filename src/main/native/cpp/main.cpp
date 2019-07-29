@@ -86,7 +86,7 @@ template <typename T> class IkProblem : public cppoptlib::BoundedProblem<T> {
 
   void gradient(const TVector &x, TVector &grad) override {
     // TODO: Compute jacobian
-    cppoptlib::Problem<T>::finiteGradient(x, grad, 0);
+    cppoptlib::Problem<T>::finiteGradient(x, grad, 3);
   }
 
   const FT target;
@@ -94,20 +94,21 @@ template <typename T> class IkProblem : public cppoptlib::BoundedProblem<T> {
 };
 
 using IkProblemf = IkProblem<float>;
+using IkProblemd = IkProblem<double>;
 
 extern "C" {
-JNIEXPORT jfloatArray JNICALL
+JNIEXPORT jdoubleArray JNICALL
 Java_com_neuronrobotics_bowlerkinematicsnative_solver_NativeIKSolver_solve(
   JNIEnv *env,
   jobject,
   jint numberOfLinks,
-  jfloatArray dhParamsJArray,
-  jfloatArray upperJointLimitsJArray,
-  jfloatArray lowerJointLimitsJArray,
-  jfloatArray initialJointAnglesJArray,
-  jfloatArray targetJArray) {
-  jfloat *dhParamsData = env->GetFloatArrayElements(dhParamsJArray, nullptr);
-  std::vector<DhParam<float>> dhParams;
+  jdoubleArray dhParamsJArray,
+  jdoubleArray upperJointLimitsJArray,
+  jdoubleArray lowerJointLimitsJArray,
+  jdoubleArray initialJointAnglesJArray,
+  jdoubleArray targetJArray) {
+  jdouble *dhParamsData = env->GetDoubleArrayElements(dhParamsJArray, nullptr);
+  std::vector<DhParam<double>> dhParams;
   dhParams.reserve(numberOfLinks);
   for (int i = 0; i < numberOfLinks; ++i) {
     dhParams.emplace_back(dhParamsData[i * 4 + 0],
@@ -115,44 +116,44 @@ Java_com_neuronrobotics_bowlerkinematicsnative_solver_NativeIKSolver_solve(
                           dhParamsData[i * 4 + 2],
                           dhParamsData[i * 4 + 3]);
   }
-  env->ReleaseFloatArrayElements(dhParamsJArray, dhParamsData, 0);
+  env->ReleaseDoubleArrayElements(dhParamsJArray, dhParamsData, 0);
 
-  jfloat *upperJointLimitsData = env->GetFloatArrayElements(upperJointLimitsJArray, nullptr);
-  Eigen::VectorXf upperJointLimits(numberOfLinks);
+  jdouble *upperJointLimitsData = env->GetDoubleArrayElements(upperJointLimitsJArray, nullptr);
+  Eigen::VectorXd upperJointLimits(numberOfLinks);
   for (int i = 0; i < numberOfLinks; ++i) {
     upperJointLimits.coeffRef(i) = upperJointLimitsData[i];
   }
-  env->ReleaseFloatArrayElements(upperJointLimitsJArray, upperJointLimitsData, 0);
+  env->ReleaseDoubleArrayElements(upperJointLimitsJArray, upperJointLimitsData, 0);
 
-  jfloat *lowerJointLimitsData = env->GetFloatArrayElements(lowerJointLimitsJArray, nullptr);
-  Eigen::VectorXf lowerJointLimits(numberOfLinks);
+  jdouble *lowerJointLimitsData = env->GetDoubleArrayElements(lowerJointLimitsJArray, nullptr);
+  Eigen::VectorXd lowerJointLimits(numberOfLinks);
   for (int i = 0; i < numberOfLinks; ++i) {
     lowerJointLimits.coeffRef(i) = lowerJointLimitsData[i];
   }
-  env->ReleaseFloatArrayElements(lowerJointLimitsJArray, lowerJointLimitsData, 0);
+  env->ReleaseDoubleArrayElements(lowerJointLimitsJArray, lowerJointLimitsData, 0);
 
-  jfloat *initialJointAnglesData = env->GetFloatArrayElements(initialJointAnglesJArray, nullptr);
-  Eigen::VectorXf initialJointAngles(numberOfLinks);
+  jdouble *initialJointAnglesData = env->GetDoubleArrayElements(initialJointAnglesJArray, nullptr);
+  Eigen::VectorXd initialJointAngles(numberOfLinks);
   for (int i = 0; i < numberOfLinks; ++i) {
     initialJointAngles.coeffRef(i) = initialJointAnglesData[i];
   }
-  env->ReleaseFloatArrayElements(initialJointAnglesJArray, initialJointAnglesData, 0);
+  env->ReleaseDoubleArrayElements(initialJointAnglesJArray, initialJointAnglesData, 0);
 
-  jfloat *targetData = env->GetFloatArrayElements(targetJArray, nullptr);
-  Eigen::Matrix4f target;
+  jdouble *targetData = env->GetDoubleArrayElements(targetJArray, nullptr);
+  Eigen::Matrix4d target;
   for (int i = 0; i < 16; ++i) {
     const int row = i / 4;
     const int col = i % 4;
     target.coeffRef(row, col) = targetData[i];
   }
-  env->ReleaseFloatArrayElements(targetJArray, targetData, 0);
+  env->ReleaseDoubleArrayElements(targetJArray, targetData, 0);
 
-  IkProblemf f(std::move(dhParams), std::move(target), lowerJointLimits, upperJointLimits);
+  IkProblemd f(std::move(dhParams), std::move(target), lowerJointLimits, upperJointLimits);
 
-  cppoptlib::LbfgsbSolver<IkProblemf> solver;
+  cppoptlib::LbfgsbSolver<IkProblemd> solver;
   solver.minimize(f, initialJointAngles);
-  jfloatArray result = env->NewFloatArray(numberOfLinks);
-  env->SetFloatArrayRegion(result, 0, numberOfLinks, initialJointAngles.data());
+  jdoubleArray result = env->NewDoubleArray(numberOfLinks);
+  env->SetDoubleArrayRegion(result, 0, numberOfLinks, initialJointAngles.data());
   return result;
 }
 }

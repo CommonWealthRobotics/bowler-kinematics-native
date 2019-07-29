@@ -17,11 +17,11 @@ build:
 
 build_script:
   - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - gradlew.bat spotlessApply --no-daemon
-  - gradlew.bat assemble --no-daemon
+  - gradlew.bat spotlessApply
+  - gradlew.bat assemble
 
 test_script:
-  - gradlew.bat check --stacktrace --no-daemon
+  - gradlew.bat check --stacktrace
 
 on_success:
   - ps: If ($env:APPVEYOR_REPO_TAG) { gradlew.bat bintrayUpload --stacktrace }

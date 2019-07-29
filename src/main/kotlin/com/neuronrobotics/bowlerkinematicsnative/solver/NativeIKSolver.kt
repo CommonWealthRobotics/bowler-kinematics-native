@@ -34,10 +34,10 @@ object NativeIKSolver {
     @SuppressWarnings("LongParameterList")
     external fun solve(
         numberOfLinks: Int,
-        dhParams: FloatArray,
-        upperJointLimits: FloatArray,
-        lowerJointLimits: FloatArray,
-        initialJointAngles: FloatArray,
-        target: FloatArray
-    ): FloatArray
+        dhParams: DoubleArray,
+        upperJointLimits: DoubleArray,
+        lowerJointLimits: DoubleArray,
+        initialJointAngles: DoubleArray,
+        target: DoubleArray
+    ): DoubleArray
 }

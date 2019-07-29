@@ -26,83 +26,87 @@ internal class NativeIKSolverTest {
     fun testSolve() {
         try {
             val expected =
-                floatArrayOf(0.6091736f, 0.32373807f, 1.2073439f, -0.032999218f, 1.1978451f, 0f)
+                doubleArrayOf(0.6091736, 0.32373807, 1.2073439, -0.032999218, 1.1978451, 0.0)
+
+            val dhParams = doubleArrayOf(
+                13.0,
+                Math.toRadians(90.0),
+                32.0,
+                Math.toRadians(-90.0),
+                25.0,
+                Math.toRadians(-90.0),
+                93.0,
+                Math.toRadians(180.0),
+                11.0,
+                Math.toRadians(90.0),
+                24.0,
+                Math.toRadians(90.0),
+                128.0,
+                Math.toRadians(-90.0),
+                0.0,
+                Math.toRadians(90.0),
+                0.0,
+                0.0,
+                0.0,
+                Math.toRadians(-90.0),
+                25.0,
+                Math.toRadians(90.0),
+                0.0,
+                0.0
+            )
+
+            val upperJointLimits = doubleArrayOf(
+                Math.toRadians(180.0),
+                Math.toRadians(180.0),
+                Math.toRadians(180.0),
+                Math.toRadians(180.0),
+                Math.toRadians(180.0),
+                Math.toRadians(180.0)
+            )
+
+            val lowerJointLimits = doubleArrayOf(
+                Math.toRadians(-180.0),
+                Math.toRadians(-180.0),
+                Math.toRadians(-180.0),
+                Math.toRadians(-180.0),
+                Math.toRadians(-180.0),
+                Math.toRadians(-180.0)
+            )
+
+            val initialJointAngles = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+
+            val target = doubleArrayOf(
+                1.0,
+                0.0,
+                0.0,
+                41.999999999999986,
+                0.0,
+                1.0,
+                0.0,
+                -44.0,
+                0.0,
+                0.0,
+                1.0,
+                169.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            )
+
             val actual = NativeIKSolver.solve(
                 6,
-                floatArrayOf(
-                    13f,
-                    Math.toRadians(90.0).toFloat(),
-                    32f,
-                    Math.toRadians(-90.0).toFloat(),
-                    25f,
-                    Math.toRadians(-90.0).toFloat(),
-                    93f,
-                    Math.toRadians(180.0).toFloat(),
-                    11f,
-                    Math.toRadians(90.0).toFloat(),
-                    24f,
-                    Math.toRadians(90.0).toFloat(),
-                    128f,
-                    Math.toRadians(-90.0).toFloat(),
-                    0f,
-                    Math.toRadians(90.0).toFloat(),
-                    0f,
-                    0f,
-                    0f,
-                    Math.toRadians(-90.0).toFloat(),
-                    25f,
-                    Math.toRadians(90.0).toFloat(),
-                    0f,
-                    0f
-                ),
-                floatArrayOf(
-                    Math.toRadians(180.0).toFloat(),
-                    Math.toRadians(180.0).toFloat(),
-                    Math.toRadians(180.0).toFloat(),
-                    Math.toRadians(180.0).toFloat(),
-                    Math.toRadians(180.0).toFloat(),
-                    Math.toRadians(180.0).toFloat()
-                ),
-                floatArrayOf(
-                    Math.toRadians(-180.0).toFloat(),
-                    Math.toRadians(-180.0).toFloat(),
-                    Math.toRadians(-180.0).toFloat(),
-                    Math.toRadians(-180.0).toFloat(),
-                    Math.toRadians(-180.0).toFloat(),
-                    Math.toRadians(-180.0).toFloat()
-                ),
-                floatArrayOf(
-                    0f,
-                    0f,
-                    0f,
-                    0f,
-                    0f,
-                    0f
-                ),
-                floatArrayOf(
-                    1f,
-                    0f,
-                    0f,
-                    41.999999999999986f,
-                    0f,
-                    1f,
-                    0f,
-                    -44f,
-                    0f,
-                    0f,
-                    1f,
-                    169f,
-                    0f,
-                    0f,
-                    0f,
-                    1f
-                )
+                dhParams,
+                upperJointLimits,
+                lowerJointLimits,
+                initialJointAngles,
+                target
             )
 
             assertArrayEquals(
                 expected,
                 actual,
-                0.07f,
+                0.07,
                 """
                 Expected:
                 ${expected.joinToString()}
