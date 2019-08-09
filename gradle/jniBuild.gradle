@@ -72,6 +72,7 @@ model {
                     test.systemProperty 'java.library.path', filePath
                     test.environment 'LD_LIBRARY_PATH', filePath
                     test.dependsOn(it.tasks.link)
+                    jar.dependsOn(it.tasks.link)
                     // Enable this if you make this a java application
                     //run.systemProperty 'java.library.path', filePath
                     //run.environment 'LD_LIBRARY_PATH', filePath

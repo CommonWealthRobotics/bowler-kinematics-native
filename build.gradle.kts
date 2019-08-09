@@ -14,7 +14,6 @@ plugins {
     id("edu.wpi.first.GradleJni") version "0.9.0" apply false
     id("com.jfrog.bintray") version "1.8.3"
     java
-    //cpp
     `maven-publish`
     `java-library`
     jacoco
@@ -171,7 +170,6 @@ spotless {
 }
 
 val jar by tasks.existing(Jar::class) {
-    //dependsOn(":bowler_kinematics_native_native_libraryReleaseSharedLibrary")
     from({
         File("$buildDir/libs/bowler_kinematics_native_native_library/shared/release/")
             .listFiles()!!
