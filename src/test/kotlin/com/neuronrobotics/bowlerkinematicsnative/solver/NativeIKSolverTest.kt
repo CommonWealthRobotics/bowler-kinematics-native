@@ -25,6 +25,8 @@ internal class NativeIKSolverTest {
     @Test
     fun testSolve() {
         try {
+            NativeIKSolver.loadLibrary()
+
             val expected =
                 doubleArrayOf(0.6091736, 0.32373807, 1.2073439, -0.032999218, 1.1978451, 0.0)
 
