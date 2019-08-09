@@ -11,10 +11,10 @@ plugins {
     id("org.jetbrains.dokka") version "0.9.18"
     id("com.adarshr.test-logger") version "1.6.0"
     id("edu.wpi.first.NativeUtils") version "2020.0.4" apply false
-    id("edu.wpi.first.GradleJni") version "0.9.0"
+    id("edu.wpi.first.GradleJni") version "0.9.0" apply false
     id("com.jfrog.bintray") version "1.8.3"
     java
-    cpp
+    //cpp
     `maven-publish`
     `java-library`
     jacoco
@@ -171,7 +171,7 @@ spotless {
 }
 
 val jar by tasks.existing(Jar::class) {
-    dependsOn(":bowler_kinematics_native_native_libraryReleaseSharedLibrary")
+    //dependsOn(":bowler_kinematics_native_native_libraryReleaseSharedLibrary")
     from({
         File("$buildDir/libs/bowler_kinematics_native_native_library/shared/release/")
             .listFiles()!!
