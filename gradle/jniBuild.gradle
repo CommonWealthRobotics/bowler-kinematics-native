@@ -67,6 +67,12 @@ model {
             }
 
             nativeUtils.usePlatformArguments(it)
+
+            if (ext.get("currentArch").contains("windows")) {
+                binaries.all {
+                    cppCompiler.args.add("/Zc:__cplusplus")
+                }
+            }
         }
     }
 
