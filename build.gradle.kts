@@ -15,6 +15,7 @@ plugins {
     cpp
     `maven-publish`
     `java-library`
+    jacoco
 }
 
 apply {
@@ -72,6 +73,23 @@ tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = listOf("-Xjvm-default=enable", "-progressive")
+    }
+}
+
+// Configures the Jacoco tool version to be the same for all projects that have it applied.
+pluginManager.withPlugin("jacoco") {
+    // If this project has the plugin applied, configure the tool version.
+    jacoco {
+        toolVersion = property("jacoco-tool.version") as String
+    }
+}
+
+tasks.withType<JacocoReport> {
+    @Suppress("UnstableApiUsage")
+    reports {
+        html.isEnabled = true
+        xml.isEnabled = true
+        csv.isEnabled = false
     }
 }
 
