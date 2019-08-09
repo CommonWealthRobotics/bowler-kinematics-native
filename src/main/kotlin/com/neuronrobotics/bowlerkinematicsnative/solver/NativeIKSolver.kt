@@ -20,30 +20,26 @@ import java.nio.file.Paths
 
 object NativeIKSolver {
 
-    // Use lazy delegation for thread-safe loading
-    private val libraryLoaded: Boolean by lazy {
-        RuntimeLoader.loadLibrary(
-            "bowler_kinematics_native_native_library",
-            Paths.get(
-                System.getProperty("user.home"),
-                "Bowler",
-                "nativecache"
-            ).toString()
-        )
-
-        true
-    }
-
-    init {
-        loadLibrary()
-    }
+    private var libraryLoaded = false
 
     /**
      * Loads the native library.
      */
     fun loadLibrary() {
-        // Access the lazy property to load the library
-        libraryLoaded
+        synchronized(libraryLoaded) {
+            if (!libraryLoaded) {
+                RuntimeLoader.loadLibrary(
+                    "bowler_kinematics_native_native_library",
+                    Paths.get(
+                        System.getProperty("user.home"),
+                        "Bowler",
+                        "nativecache"
+                    ).toString()
+                )
+
+                libraryLoaded = true
+            }
+        }
     }
 
     @SuppressWarnings("LongParameterList")

@@ -2,6 +2,7 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 import edu.wpi.first.toolchain.NativePlatforms
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -170,20 +171,30 @@ spotless {
 }
 
 val jar by tasks.existing(Jar::class) {
-    fun File.getLibraryFile() = listFiles()
-        ?.firstOrNull { it.extension in listOf("so", "dylib", "dll") }
-        .also { println("Jar library file is: $it") }
+    fun getLibraryFile(variant: String) =
+        File("$buildDir/libs/bowler_kinematics_native_native_library/shared/$variant/release/")
+            .listFiles()
+            ?.firstOrNull { it.extension in listOf("so", "dylib", "dll") }
+            .also { println("Jar library file is: $it") }
 
-    if (NativePlatforms.desktop.contains("linux")) {
+    from(
+        { getLibraryFile(NativePlatforms.desktop) }
+    ) {
+        into("${NativePlatforms.desktopOS()}/${NativePlatforms.desktopArch()}")
+    }
+
+    if (OperatingSystem.current().isLinux) {
         from(
-            { File("$buildDir/libs/bowler_kinematics_native_native_library/shared/${NativePlatforms.desktop}/release/").getLibraryFile() },
-            { File("$buildDir/libs/bowler_kinematics_native_native_library/shared/${NativePlatforms.raspbian}/release/").getLibraryFile() },
-            { File("$buildDir/libs/bowler_kinematics_native_native_library/shared/${NativePlatforms.bionic}/release/").getLibraryFile() }
-        )
-    } else {
+            { getLibraryFile(NativePlatforms.raspbian) }
+        ) {
+            into("linux/raspbian")
+        }
+
         from(
-            { File("$buildDir/libs/bowler_kinematics_native_native_library/shared/${NativePlatforms.desktop}/release/").getLibraryFile() }
-        )
+            { getLibraryFile(NativePlatforms.bionic) }
+        ) {
+            into("linux/aarch64bionic")
+        }
     }
 }
 

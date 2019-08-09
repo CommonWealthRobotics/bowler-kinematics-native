@@ -84,9 +84,9 @@ object RuntimeLoader {
      */
     private fun getLibraryResource(libName: String): String {
         val (prefix, suffix) = when {
-            SystemUtils.IS_OS_WINDOWS -> "" to ".dll"
-            SystemUtils.IS_OS_MAC -> "lib" to ".dylib"
-            SystemUtils.IS_OS_LINUX -> "lib" to ".so"
+            SystemUtils.IS_OS_WINDOWS -> "windows/${SystemUtils.OS_ARCH}/" to ".dll"
+            SystemUtils.IS_OS_MAC -> "osx/${SystemUtils.OS_ARCH}/lib" to ".dylib"
+            SystemUtils.IS_OS_LINUX -> "linux/${SystemUtils.OS_ARCH}/lib" to ".so"
             else -> throw IllegalStateException("Failed to determine OS")
         }
 

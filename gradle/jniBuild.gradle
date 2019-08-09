@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 apply {
     plugin 'cpp'
     plugin 'edu.wpi.first.NativeUtils'
@@ -68,9 +70,9 @@ model {
 
             nativeUtils.usePlatformArguments(it)
 
-            if (ext.get("currentArch").contains("windows")) {
-                binaries.all {
-                    cppCompiler.args.add("/Zc:__cplusplus")
+            binaries.all {
+                if (OperatingSystem.current().isWindows()) {
+                    cppCompiler.args "/Zc:__cplusplus"
                 }
             }
         }
