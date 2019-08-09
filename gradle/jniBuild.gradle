@@ -1,5 +1,7 @@
 apply {
+    plugin 'cpp'
     plugin 'edu.wpi.first.NativeUtils'
+    plugin 'edu.wpi.first.GradleJni'
 }
 
 buildscript {
