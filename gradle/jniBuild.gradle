@@ -1,4 +1,6 @@
-import org.apache.commons.lang3.SystemUtils
+apply {
+    plugin 'edu.wpi.first.NativeUtils'
+}
 
 buildscript {
     repositories {
@@ -13,17 +15,30 @@ buildscript {
     }
 }
 
+nativeUtils.addWpiNativeUtils()
+nativeUtils.withRaspbian()
+nativeUtils.withBionic()
+nativeUtils.wpi.addWarnings()
+nativeUtils.setSinglePrintPerPlatform()
+
 model {
-    //noinspection GroovyAssignabilityCheck
     components {
+        all {
+            nativeUtils.useAllPlatforms(it)
+        }
+
         bowler_kinematics_native_native_library(JniNativeLibrarySpec) {
             enableCheckTask true
             javaCompileTasks << compileJava
+
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
+
             sources {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
-                        include '*.cpp'
+                        include '**/*.cpp'
                     }
 
                     exportedHeaders {
@@ -37,33 +52,24 @@ model {
                 }
             }
 
-            binaries.all {
-                if (SystemUtils.IS_OS_WINDOWS) {
-                    cppCompiler.args "/Zc:__cplusplus", "/std:c++17", "/O2", "/EHsc"
-                } else {
-                    cppCompiler.args "-std=c++17", "-O3"
-                }
-            }
+            nativeUtils.usePlatformArguments(it)
         }
     }
 
     tasks {
-        def components = $.components
+        def c = $.components
         def found = false
-        components.each {
+        c.each {
             if (it in JniNativeLibrarySpec) {
-                def binaries = it.binaries.withType(SharedLibraryBinarySpec).each {
-                    if (found) {
-                        return
-                    } else {
-                        found = true
-                    }
-
-                    test.dependsOn it.tasks.link
-
+                def bin = it.binaries.withType(SharedLibraryBinarySpec).each {
+                    if (found) return
+                    def arch = it.targetPlatform.name.replace("_", "")
+                    if (arch != ext.get("currentArch")) return
+                    found = true
                     def filePath = it.tasks.link.linkedFile.get().asFile.parentFile
-                    test.systemProperty 'java.library.path', filePath.path + "/"
-                    test.environment 'LD_LIBRARY_PATH', filePath.path + "/"
+                    test.systemProperty 'java.library.path', filePath
+                    test.environment 'LD_LIBRARY_PATH', filePath
+                    test.dependsOn(it.tasks.link)
                     // Enable this if you make this a java application
                     //run.systemProperty 'java.library.path', filePath
                     //run.environment 'LD_LIBRARY_PATH', filePath

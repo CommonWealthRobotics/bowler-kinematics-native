@@ -1,4 +1,5 @@
 import com.adarshr.gradle.testlogger.theme.ThemeType
+import edu.wpi.first.toolchain.NativePlatforms
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -9,6 +10,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.0.0-RC16"
     id("org.jetbrains.dokka") version "0.9.18"
     id("com.adarshr.test-logger") version "1.6.0"
+    id("edu.wpi.first.NativeUtils") version "2020.0.4" apply false
     id("edu.wpi.first.GradleJni") version "0.9.0"
     id("com.jfrog.bintray") version "1.8.3"
     java
@@ -38,8 +40,12 @@ buildscript {
     }
 }
 
+extra.apply {
+    set("currentArch", NativePlatforms.desktop)
+}
+
 val projectName = "bowler-kinematics-native"
-val osName = System.getenv("BOWLER_KINEMATICS_NATIVE_OS_NAME") ?: "UNKNOWN-OS"
+val osName = NativePlatforms.desktop // System.getenv("BOWLER_KINEMATICS_NATIVE_OS_NAME") ?: "UNKNOWN-OS"
 val publicationName = "publication-$projectName-${name.toLowerCase()}"
 val publishedVersionName = "${property("bowler-kinematics-native.version") as String}-$osName"
 
@@ -165,9 +171,9 @@ spotless {
 }
 
 val jar by tasks.existing(Jar::class) {
-    dependsOn(":bowler_kinematics_native_native_librarySharedLibrary")
+    dependsOn(":bowler_kinematics_native_native_libraryReleaseSharedLibrary")
     from({
-        File("$buildDir/libs/bowler_kinematics_native_native_library/shared/")
+        File("$buildDir/libs/bowler_kinematics_native_native_library/shared/release/")
             .listFiles()!!
             .first { it.extension in listOf("so", "dylib", "dll") }
             .also { println(it) }
