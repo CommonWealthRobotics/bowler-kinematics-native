@@ -23,6 +23,14 @@ nativeUtils.withBionic()
 nativeUtils.wpi.addWarnings()
 nativeUtils.setSinglePrintPerPlatform()
 
+toolchainsPlugin.crossCompilers.named(nativeUtils.wpi.platforms.raspbian) {
+    optional.set(false)
+}
+
+toolchainsPlugin.crossCompilers.named(nativeUtils.wpi.platforms.aarch64bionic) {
+    optional.set(false)
+}
+
 toolchainsPlugin.crossCompilers.named(nativeUtils.wpi.platforms.roborio) {
     optional.set(true)
 }
@@ -68,18 +76,33 @@ model {
         c.each {
             if (it in JniNativeLibrarySpec) {
                 def bin = it.binaries.withType(SharedLibraryBinarySpec).each {
-                    if (found) return
-                    def arch = it.targetPlatform.name.replace("_", "")
-                    if (arch != ext.get("currentArch")) return
+                    if (found) {
+                        return
+                    }
+
+                    def arch = it.targetPlatform.name
+                    println("target: " + arch + ", current: " + ext.get("currentArch") + "; " + it.buildType.name)
+
+                    // Don't depend on rio build
+                    if (!arch.contains("athena")) {
+                        jar.dependsOn(it.tasks.link)
+                    }
+
+                    // Only include the release variant binary for the current platform
+                    if (arch != ext.get("currentArch") || it.buildType.name != 'release') {
+                        return
+                    }
+
                     found = true
+
                     def filePath = it.tasks.link.linkedFile.get().asFile.parentFile
                     test.systemProperty 'java.library.path', filePath
                     test.environment 'LD_LIBRARY_PATH', filePath
-                    test.dependsOn(it.tasks.link)
-                    jar.dependsOn(it.tasks.link)
                     // Enable this if you make this a java application
                     //run.systemProperty 'java.library.path', filePath
                     //run.environment 'LD_LIBRARY_PATH', filePath
+
+                    test.dependsOn(it.tasks.link)
                 }
             }
         }

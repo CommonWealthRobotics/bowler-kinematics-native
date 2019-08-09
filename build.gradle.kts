@@ -44,9 +44,9 @@ extra.apply {
 }
 
 val projectName = "bowler-kinematics-native"
-val osName = NativePlatforms.desktop // System.getenv("BOWLER_KINEMATICS_NATIVE_OS_NAME") ?: "UNKNOWN-OS"
 val publicationName = "publication-$projectName-${name.toLowerCase()}"
-val publishedVersionName = "${property("bowler-kinematics-native.version") as String}-$osName"
+val publishedVersionName =
+    "${property("bowler-kinematics-native.version") as String}-${NativePlatforms.desktop}"
 
 group = "com.neuronrobotics"
 version = publishedVersionName
@@ -170,12 +170,21 @@ spotless {
 }
 
 val jar by tasks.existing(Jar::class) {
-    from({
-        File("$buildDir/libs/bowler_kinematics_native_native_library/shared/release/")
-            .listFiles()!!
-            .first { it.extension in listOf("so", "dylib", "dll") }
-            .also { println(it) }
-    })
+    fun File.getLibraryFile() = listFiles()
+        ?.firstOrNull { it.extension in listOf("so", "dylib", "dll") }
+        .also { println("Jar library file is: $it") }
+
+    if (NativePlatforms.desktop.contains("linux")) {
+        from(
+            { File("$buildDir/libs/bowler_kinematics_native_native_library/shared/${NativePlatforms.desktop}/release/").getLibraryFile() },
+            { File("$buildDir/libs/bowler_kinematics_native_native_library/shared/${NativePlatforms.raspbian}/release/").getLibraryFile() },
+            { File("$buildDir/libs/bowler_kinematics_native_native_library/shared/${NativePlatforms.bionic}/release/").getLibraryFile() }
+        )
+    } else {
+        from(
+            { File("$buildDir/libs/bowler_kinematics_native_native_library/shared/${NativePlatforms.desktop}/release/").getLibraryFile() }
+        )
+    }
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
@@ -192,36 +201,34 @@ val dokkaJar by tasks.creating(Jar::class) {
     from(tasks.dokka)
 }
 
-if (osName != "UNKNOWN-OS") {
-    publishing {
-        publications {
-            create<MavenPublication>(publicationName) {
-                artifactId = projectName
-                from(components["java"])
-                artifact(sourcesJar)
-                artifact(dokkaJar)
-            }
+publishing {
+    publications {
+        create<MavenPublication>(publicationName) {
+            artifactId = projectName
+            from(components["java"])
+            artifact(sourcesJar)
+            artifact(dokkaJar)
         }
     }
+}
 
-    bintray {
-        val bintrayApiUser = properties["bintray.api.user"] ?: System.getenv("BINTRAY_USER")
-        val bintrayApiKey = properties["bintray.api.key"] ?: System.getenv("BINTRAY_API_KEY")
-        user = bintrayApiUser as String?
-        key = bintrayApiKey as String?
-        setPublications(publicationName)
-        with(pkg) {
-            repo = "maven-artifacts"
-            name = projectName
-            userOrg = "commonwealthrobotics"
-            publish = true
-            setLicenses("LGPL-3.0")
-            vcsUrl = "https://github.com/CommonWealthRobotics/bowler-kinematics-native.git"
-            githubRepo = "https://github.com/CommonWealthRobotics/bowler-kinematics-native"
-            with(version) {
-                name = publishedVersionName
-                desc = "bowler-kinematics implemented natively."
-            }
+bintray {
+    val bintrayApiUser = properties["bintray.api.user"] ?: System.getenv("BINTRAY_USER")
+    val bintrayApiKey = properties["bintray.api.key"] ?: System.getenv("BINTRAY_API_KEY")
+    user = bintrayApiUser as String?
+    key = bintrayApiKey as String?
+    setPublications(publicationName)
+    with(pkg) {
+        repo = "maven-artifacts"
+        name = projectName
+        userOrg = "commonwealthrobotics"
+        publish = true
+        setLicenses("LGPL-3.0")
+        vcsUrl = "https://github.com/CommonWealthRobotics/bowler-kinematics-native.git"
+        githubRepo = "https://github.com/CommonWealthRobotics/bowler-kinematics-native"
+        with(version) {
+            name = publishedVersionName
+            desc = "bowler-kinematics implemented natively."
         }
     }
 }

@@ -8,6 +8,32 @@ stages:
 
       steps:
         - task: Gradle@2
+            displayName: 'Install Raspbian Toolchain'
+            inputs:
+              workingDirectory: ''
+              gradleWrapperFile: 'gradlew'
+              gradleOptions: '-Xmx3072m'
+              options: '--stacktrace'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.11'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: false
+              tasks: 'installRaspbianToolchain'
+
+        - task: Gradle@2
+            displayName: 'Install Bionic Toolchain'
+            inputs:
+              workingDirectory: ''
+              gradleWrapperFile: 'gradlew'
+              gradleOptions: '-Xmx3072m'
+              options: '--stacktrace'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.11'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: false
+              tasks: 'installBionicToolchain'
+
+        - task: Gradle@2
           displayName: 'Check'
           inputs:
             workingDirectory: ''
@@ -42,7 +68,6 @@ stages:
           env:
             BINTRAY_USER: $(BINTRAY_USER)
             BINTRAY_API_KEY: $(BINTRAY_API_KEY)
-            BOWLER_KINEMATICS_NATIVE_OS_NAME: linux
 
     - job: MacOS
 
@@ -51,6 +76,32 @@ stages:
 
       steps:
         - task: Gradle@2
+            displayName: 'Install Raspbian Toolchain'
+            inputs:
+              workingDirectory: ''
+              gradleWrapperFile: 'gradlew'
+              gradleOptions: '-Xmx3072m'
+              options: '--stacktrace'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.11'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: false
+              tasks: 'installRaspbianToolchain'
+
+        - task: Gradle@2
+            displayName: 'Install Bionic Toolchain'
+            inputs:
+              workingDirectory: ''
+              gradleWrapperFile: 'gradlew'
+              gradleOptions: '-Xmx3072m'
+              options: '--stacktrace'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.11'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: false
+              tasks: 'installBionicToolchain'
+
+        - task: Gradle@2
           displayName: 'Check'
           inputs:
             workingDirectory: ''
@@ -79,7 +130,6 @@ stages:
           env:
             BINTRAY_USER: $(BINTRAY_USER)
             BINTRAY_API_KEY: $(BINTRAY_API_KEY)
-            BOWLER_KINEMATICS_NATIVE_OS_NAME: macos
 
     - job: Windows
 
@@ -88,6 +138,32 @@ stages:
 
       steps:
         - task: Gradle@2
+            displayName: 'Install Raspbian Toolchain'
+            inputs:
+              workingDirectory: ''
+              gradleWrapperFile: 'gradlew'
+              gradleOptions: '-Xmx3072m'
+              options: '--stacktrace'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.11'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: false
+              tasks: 'installRaspbianToolchain'
+
+        - task: Gradle@2
+            displayName: 'Install Bionic Toolchain'
+            inputs:
+              workingDirectory: ''
+              gradleWrapperFile: 'gradlew'
+              gradleOptions: '-Xmx3072m'
+              options: '--stacktrace'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.11'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: false
+              tasks: 'installBionicToolchain'
+
+        - task: Gradle@2
           displayName: 'Check'
           inputs:
             workingDirectory: ''
@@ -116,4 +192,3 @@ stages:
           env:
             BINTRAY_USER: $(BINTRAY_USER)
             BINTRAY_API_KEY: $(BINTRAY_API_KEY)
-            BOWLER_KINEMATICS_NATIVE_OS_NAME: windows
