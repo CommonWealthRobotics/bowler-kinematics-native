@@ -1,0 +1,194 @@
+stages:
+- stage: Build
+  jobs:
+    - job: Linux_x64
+
+      pool:
+        vmImage: ubuntu-16.04
+
+      steps:
+        - task: Gradle@2
+          displayName: 'Install Raspbian Toolchain'
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace -Ptoolchain-optional-bionic -Ptoolchain-optional-raspbian'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'installRaspbianToolchain'
+
+        - task: Gradle@2
+          displayName: 'Install Bionic Toolchain'
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace -Ptoolchain-optional-bionic -Ptoolchain-optional-raspbian'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'installBionicToolchain'
+
+        - task: Gradle@2
+          displayName: 'Check'
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace -PlogTests -Pheadless'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: true
+            testResultsFiles: '**/TEST-*.xml'
+            tasks: 'jar check jacocoTestReport'
+
+        - bash: bash <(curl -s https://codecov.io/bash)
+          displayName: 'CodeCov'
+          env:
+            CODECOV_TOKEN: $(CODECOV_TOKEN)
+
+        - task: Gradle@2
+          displayName: 'Publish'
+          condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'bintrayUpload'
+          env:
+            BINTRAY_USER: $(BINTRAY_USER)
+            BINTRAY_API_KEY: $(BINTRAY_API_KEY)
+
+    - job: MacOS
+
+      pool:
+        vmImage: macOS-10.14
+
+      steps:
+        - task: Gradle@2
+          displayName: 'Install Raspbian Toolchain'
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace -Ptoolchain-optional-bionic -Ptoolchain-optional-raspbian'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'installRaspbianToolchain'
+
+        - task: Gradle@2
+          displayName: 'Install Bionic Toolchain'
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace -Ptoolchain-optional-bionic -Ptoolchain-optional-raspbian'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'installBionicToolchain'
+
+        - task: Gradle@2
+          displayName: 'Check'
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace -PlogTests -Pheadless'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'jar check jacocoTestReport'
+
+        - task: Gradle@2
+          displayName: 'Publish'
+          condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'bintrayUpload'
+          env:
+            BINTRAY_USER: $(BINTRAY_USER)
+            BINTRAY_API_KEY: $(BINTRAY_API_KEY)
+
+    - job: Windows
+
+      pool:
+        vmImage: windows-2019
+
+      steps:
+        - task: Gradle@2
+          displayName: 'Install Raspbian Toolchain'
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace -Ptoolchain-optional-bionic -Ptoolchain-optional-raspbian'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'installRaspbianToolchain'
+
+        - task: Gradle@2
+          displayName: 'Install Bionic Toolchain'
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace -Ptoolchain-optional-bionic -Ptoolchain-optional-raspbian'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'installBionicToolchain'
+
+        - task: Gradle@2
+          displayName: 'Check'
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace -PlogTests -Pheadless'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'jar check jacocoTestReport'
+
+        - task: Gradle@2
+          displayName: 'Publish'
+          condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            options: '--stacktrace'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            tasks: 'bintrayUpload'
+          env:
+            BINTRAY_USER: $(BINTRAY_USER)
+            BINTRAY_API_KEY: $(BINTRAY_API_KEY)

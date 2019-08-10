@@ -1,6 +1,8 @@
 import com.adarshr.gradle.testlogger.theme.ThemeType
+import edu.wpi.first.toolchain.NativePlatforms
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -9,12 +11,13 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.0.0-RC16"
     id("org.jetbrains.dokka") version "0.9.18"
     id("com.adarshr.test-logger") version "1.6.0"
-    id("edu.wpi.first.GradleJni") version "0.9.0"
+    id("edu.wpi.first.NativeUtils") version "2020.0.4" apply false
+    id("edu.wpi.first.GradleJni") version "0.9.0" apply false
     id("com.jfrog.bintray") version "1.8.3"
     java
-    cpp
     `maven-publish`
     `java-library`
+    jacoco
 }
 
 apply {
@@ -37,10 +40,14 @@ buildscript {
     }
 }
 
+extra.apply {
+    set("currentArch", NativePlatforms.desktop)
+}
+
 val projectName = "bowler-kinematics-native"
-val osName = System.getenv("BOWLER_KINEMATICS_NATIVE_OS_NAME") ?: "UNKNOWN-OS"
 val publicationName = "publication-$projectName-${name.toLowerCase()}"
-val publishedVersionName = "${property("bowler-kinematics-native.version") as String}-$osName"
+val publishedVersionName =
+    "${property("bowler-kinematics-native.version") as String}-${NativePlatforms.desktop}"
 
 group = "com.neuronrobotics"
 version = publishedVersionName
@@ -59,7 +66,6 @@ dependencies {
     )
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.1.0")
-
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.1.0")
 }
 
@@ -72,6 +78,23 @@ tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = listOf("-Xjvm-default=enable", "-progressive")
+    }
+}
+
+// Configures the Jacoco tool version to be the same for all projects that have it applied.
+pluginManager.withPlugin("jacoco") {
+    // If this project has the plugin applied, configure the tool version.
+    jacoco {
+        toolVersion = property("jacoco-tool.version") as String
+    }
+}
+
+tasks.withType<JacocoReport> {
+    @Suppress("UnstableApiUsage")
+    reports {
+        html.isEnabled = true
+        xml.isEnabled = true
+        csv.isEnabled = false
     }
 }
 
@@ -147,13 +170,31 @@ spotless {
 }
 
 val jar by tasks.existing(Jar::class) {
-    dependsOn(":bowler_kinematics_native_native_librarySharedLibrary")
-    from({
-        File("$buildDir/libs/bowler_kinematics_native_native_library/shared/")
-            .listFiles()!!
-            .first { it.extension in listOf("so", "dylib", "dll") }
-            .also { println(it) }
-    })
+    fun getLibraryFile(variant: String) =
+        File("$buildDir/libs/bowler_kinematics_native_native_library/shared/$variant/release/")
+            .listFiles()
+            ?.firstOrNull { it.extension in listOf("so", "dylib", "dll") }
+            .also { println("Jar library file is: $it") }
+
+    from(
+        { getLibraryFile(NativePlatforms.desktop) }
+    ) {
+        into("${NativePlatforms.desktopOS()}/${NativePlatforms.desktopArch()}")
+    }
+
+    if (OperatingSystem.current().isLinux) {
+        from(
+            { getLibraryFile(NativePlatforms.raspbian) }
+        ) {
+            into("linux/raspbian")
+        }
+
+        from(
+            { getLibraryFile(NativePlatforms.bionic) }
+        ) {
+            into("linux/aarch64bionic")
+        }
+    }
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
@@ -170,36 +211,34 @@ val dokkaJar by tasks.creating(Jar::class) {
     from(tasks.dokka)
 }
 
-if (osName != "UNKNOWN-OS") {
-    publishing {
-        publications {
-            create<MavenPublication>(publicationName) {
-                artifactId = projectName
-                from(components["java"])
-                artifact(sourcesJar)
-                artifact(dokkaJar)
-            }
+publishing {
+    publications {
+        create<MavenPublication>(publicationName) {
+            artifactId = projectName
+            from(components["java"])
+            artifact(sourcesJar)
+            artifact(dokkaJar)
         }
     }
+}
 
-    bintray {
-        val bintrayApiUser = properties["bintray.api.user"] ?: System.getenv("BINTRAY_USER")
-        val bintrayApiKey = properties["bintray.api.key"] ?: System.getenv("BINTRAY_API_KEY")
-        user = bintrayApiUser as String?
-        key = bintrayApiKey as String?
-        setPublications(publicationName)
-        with(pkg) {
-            repo = "maven-artifacts"
-            name = projectName
-            userOrg = "commonwealthrobotics"
-            publish = true
-            setLicenses("LGPL-3.0")
-            vcsUrl = "https://github.com/CommonWealthRobotics/bowler-kinematics-native.git"
-            githubRepo = "https://github.com/CommonWealthRobotics/bowler-kinematics-native"
-            with(version) {
-                name = publishedVersionName
-                desc = "bowler-kinematics implemented natively."
-            }
+bintray {
+    val bintrayApiUser = properties["bintray.api.user"] ?: System.getenv("BINTRAY_USER")
+    val bintrayApiKey = properties["bintray.api.key"] ?: System.getenv("BINTRAY_API_KEY")
+    user = bintrayApiUser as String?
+    key = bintrayApiKey as String?
+    setPublications(publicationName)
+    with(pkg) {
+        repo = "maven-artifacts"
+        name = projectName
+        userOrg = "commonwealthrobotics"
+        publish = true
+        setLicenses("LGPL-3.0")
+        vcsUrl = "https://github.com/CommonWealthRobotics/bowler-kinematics-native.git"
+        githubRepo = "https://github.com/CommonWealthRobotics/bowler-kinematics-native"
+        with(version) {
+            name = publishedVersionName
+            desc = "bowler-kinematics implemented natively."
         }
     }
 }
