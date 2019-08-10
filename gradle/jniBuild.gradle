@@ -71,6 +71,8 @@ model {
             binaries.all {
                 println("target platform binary: " + it.targetPlatform.name)
                 if (it.targetPlatform.name.contains("windows")) {
+                    // MSVC needs /Zc:__cplusplus because of
+                    // https://docs.microsoft.com/en-us/cpp/build/reference/zc-cplusplus?view=vs-2019
                     cppCompiler.args "/Zc:__cplusplus"
                 }
             }
