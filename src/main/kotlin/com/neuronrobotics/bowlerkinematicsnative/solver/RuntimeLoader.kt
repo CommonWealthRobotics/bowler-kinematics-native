@@ -84,13 +84,18 @@ object RuntimeLoader {
      */
     private fun getLibraryResource(libName: String): String {
         val (prefix, suffix) = when {
-            SystemUtils.IS_OS_WINDOWS -> "windows/${SystemUtils.OS_ARCH}/" to ".dll"
-            SystemUtils.IS_OS_MAC -> "osx/${SystemUtils.OS_ARCH}/lib" to ".dylib"
-            SystemUtils.IS_OS_LINUX -> "linux/${SystemUtils.OS_ARCH}/lib" to ".so"
+            SystemUtils.IS_OS_WINDOWS -> "windows/${desktopArch()}/" to ".dll"
+            SystemUtils.IS_OS_MAC -> "osx/${desktopArch()}/lib" to ".dylib"
+            SystemUtils.IS_OS_LINUX -> "linux/${desktopArch()}/lib" to ".so"
             else -> throw IllegalStateException("Failed to determine OS")
         }
 
         return prefix + libName + suffix
+    }
+
+    private fun desktopArch(): String {
+        val arch = System.getProperty("os.arch")
+        return if (arch == "amd64" || arch == "x86_64") "x86-64" else "x86"
     }
 
     private fun getLoadErrorMessage(libName: String) =
