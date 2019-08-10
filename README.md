@@ -15,7 +15,7 @@ Get the artifacts [here](https://bintray.com/commonwealthrobotics/maven-artifact
 maven("https://dl.bintray.com/commonwealthrobotics/maven-artifacts")
 ```
 
-Although the latest version number may be `x.x.x-linuxx86-64`, `x.x.x-macosx86-64`, or
+Although the latest version number may be `x.x.x-linuxx86-64`, `x.x.x-osxx86-64`, or
 `x.x.x-windowsx86-64`, there are multiple variants of the same version available. Declare the
 correct dependency for your platform using:
 
