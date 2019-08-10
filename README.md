@@ -21,7 +21,7 @@ correct dependency for your platform using:
 
 In `gradle.properties`:
 ```properties
-bowler-kinematics-native.version=x.x.x
+bowler-kinematics-native.partial-version=x.x.x
 ```
 
 In your build file:
